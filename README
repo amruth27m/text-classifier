@@ -1,0 +1,1 @@
+This is an application made to classify automated text messages received into a set of predefined categories. The classifier is built using TensorFlow, and is meant to be ported to be used as a mobile application. 
