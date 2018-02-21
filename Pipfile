@@ -12,3 +12,5 @@ verify_ssl = true
 [packages]
 
 tensorflow = "*"
+numpy = "*"
+pandas = "*"
