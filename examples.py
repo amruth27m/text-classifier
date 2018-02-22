@@ -4,43 +4,6 @@ import numpy
 
 NEWLINE = "\n"
 
-SKIP_FILES = {'cmds'}
-
-def read_files(path):
-    #Considering every file in root folder
-    for root, dir_names, file_names in os.walk(path):
-        #recursively call into sub-directories
-        for p in dir_names:
-            read_files(os.path.join(root, p))
-        for file_name in file_names:
-            #skip those files in SKIP_FILES
-            if file_name not in SKIP_FILES:
-                file_path = os.path.join(root, file_name)
-                if os.path.isfile(file_path):
-                    past_header, lines = False, []
-                    #Opening the file
-                    f = open(file_path, encoding = 'latin-1')
-                    #Checking line by line, start adding lines only after NEWLINE
-                    for line in f:
-                        if past_header:
-                            lines.append(line)
-                        elif line == NEWLINE:
-                            past_header = True
-                    f.close()
-                    content = NEWLINE.join(lines)
-                    yield file_path, content
-                    
-                    
-                    
-#Creates data into data frame                    
-def build_data_frame(path, classification):
-    rows = []
-    index = []
-    for file_name, text in read_files(path):
-        rows.append({'text':text, 'class': classification})
-        index.append(file_name)
-        return DataFrame(rows, index=index)
-        
 HAM = 'ham'
 SPAM = 'spam'
 
@@ -60,6 +23,53 @@ SOURCES = [
 ]
 
 
+SKIP_FILES = {'cmds'}
+
+def read_files(path):
+    #Considering every file in root folder
+    for root, dir_names, file_names in os.walk(path):
+        #recursively call into sub-directories
+        for path in dir_names:
+            read_files(os.path.join(root, path))
+        #print(file_names)
+        for file_name in file_names:
+            #skip those files in SKIP_FILES
+            if file_name not in SKIP_FILES:
+                #print(file_name)
+                file_path = os.path.join(root, file_name)
+                #print("file_path: " + file_path)
+                if os.path.isfile(file_path):
+                    past_header, lines = False, []
+                    #Opening the file
+                    f = open(file_path, encoding = 'latin-1')
+                    #Checking line by line, start adding lines only after NEWLINE
+                    for line in f:
+                        if past_header:
+                            lines.append(line)
+                        elif line == NEWLINE:
+                            past_header = True
+                    f.close()
+                    content = NEWLINE.join(lines)
+                    #print(content)
+#                    print(file_path)
+                    yield file_path, content
+                    
+                    
+                    
+#Creates data into data frame                    
+def build_data_frame(path, classification):
+    rows = []
+    index = []
+    for file_name, text in read_files(path):
+        rows.append({'text':text, 'class': classification})
+        #print(text)
+        index.append(file_name)
+    data_frame = DataFrame(rows, index = index)
+    return data_frame
+
+
+
+
 data = DataFrame({'text': [], 'class': []})
 
 for path, classification in SOURCES:
@@ -67,5 +77,4 @@ for path, classification in SOURCES:
 
 data = data.reindex(numpy.random.permutation(data.index))
 
-print(data)
-http://www.aueb.gr/users/ion/data/enron-spam/raw/ham/farmer-d.tar.gz
+#print(data)
