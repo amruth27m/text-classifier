@@ -12,7 +12,7 @@ from sklearn.metrics import confusion_matrix, f1_score
 #Declarations#
 NEWLINE = "\n"
 pipeline = Pipeline([
-    ('vectorizer', CountVectorizer()),
+    ('vectorizer', CountVectorizer(ngram_range=(1,2))),
     ('classifier', MultinomialNB()) 
 ])
 
