@@ -2,13 +2,19 @@
 import os
 from pandas import DataFrame
 import numpy
-#from sklearn.feature_extraction.text import CountVectorizer
-#from sklearn.naive_bayes import MultinomialNB
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.pipeline import Pipeline
+from sklearn.cross_validation import KFold
+from sklearn.metrics import confusion_matrix, f1_score
+
 
 #Declarations#
 NEWLINE = "\n"
-#count_vectorizer = CountVectorizer()
-#classifier = MultinomialNB()
+pipeline = Pipeline([
+    ('vectorizer', CountVectorizer()),
+    ('classifier', MultinomialNB()) 
+])
 
 HAM = 'ham'
 SPAM = 'spam'
@@ -29,6 +35,8 @@ SOURCES = [
 ]
 
 SKIP_FILES = {'cmds'}
+
+examples = ['Free Viagra call today!', "I'm going to attend the Linux users group tomorrow."]
 
 #Function for reading all file contents 
 def read_files(path):
@@ -73,19 +81,42 @@ def build_data_frame(path, classification):
     data_frame = DataFrame(rows, index = index)
     return data_frame
 
-
-
-
 data = DataFrame({'text': [], 'class': []})
 
 for path, classification in SOURCES:
     data = data.append(build_data_frame(path, classification))
 
 data = data.reindex(numpy.random.permutation(data.index))
-#counts = count_vectorizer.fit_transform(data['text'].values)
 
-#targets = data['class'].values
-#classifier.fit(counts, targets)
+
+
+#Now that the data is available in the required format, we can finally build our classifer. We evaluate it using 6_fold cross-validation
+k_fold = KFold(n=len(data), n_folds=6)
+scores = []
+confusion = numpy.array([[0,0], [0,0]])
+
+#We get 6 pairs of 1:5 test-train data indices
+for train_indices, test_indices in k_fold:
+    
+    train_text = data.iloc[train_indices]['text'].values
+    train_y = data.iloc[train_indices]['class'].values
+    
+    test_text = data.iloc[test_indices]['text'].values
+    test_y = data.iloc[test_indices]['class'].values
+
+    
+    pipeline.fit(train_text, train_y)
+    predictions = pipeline.predict(test_text)
+    
+    confusion += confusion_matrix(test_y, predictions)
+    score = f1_score(test_y, predictions, pos_label=SPAM)
+    
+    scores.append(score)
+print('Total emails classified:', len(data))
+print('Score:', sum(scores)/len(scores))
+print('Confusion matrix:')
+print(confusion)
+
 
 
 #print(data)
