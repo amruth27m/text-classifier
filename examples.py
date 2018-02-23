@@ -1,8 +1,14 @@
+#Libraries#
 import os
 from pandas import DataFrame
 import numpy
+#from sklearn.feature_extraction.text import CountVectorizer
+#from sklearn.naive_bayes import MultinomialNB
 
+#Declarations#
 NEWLINE = "\n"
+#count_vectorizer = CountVectorizer()
+#classifier = MultinomialNB()
 
 HAM = 'ham'
 SPAM = 'spam'
@@ -22,9 +28,9 @@ SOURCES = [
     ('data/SH',          SPAM)
 ]
 
-
 SKIP_FILES = {'cmds'}
 
+#Function for reading all file contents 
 def read_files(path):
     #Considering every file in root folder
     for root, dir_names, file_names in os.walk(path):
@@ -76,5 +82,10 @@ for path, classification in SOURCES:
     data = data.append(build_data_frame(path, classification))
 
 data = data.reindex(numpy.random.permutation(data.index))
+#counts = count_vectorizer.fit_transform(data['text'].values)
+
+#targets = data['class'].values
+#classifier.fit(counts, targets)
+
 
 #print(data)

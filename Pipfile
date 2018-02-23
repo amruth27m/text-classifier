@@ -14,3 +14,5 @@ verify_ssl = true
 tensorflow = "*"
 numpy = "*"
 pandas = "*"
+sklearn = "*"
+scipy = "*"
