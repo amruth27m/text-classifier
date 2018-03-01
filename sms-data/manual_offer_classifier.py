@@ -3,27 +3,47 @@ import json
 
 clear = lambda: os.system('cls')
 
-with open('offer_data.json', 'r') as data_file:
-    json_data = data_file.read()
 
-arr = json.loads(json_data)
 
-print(len(arr))
-
-e_commerce = []
-fashion = []
-food_and_beverage = []
-travel = []
-entertainment = []
-health = []
-
-general = []
 
 
 def label():
-    myName = input("Whats your name: ")
+    
+    myName = ''
+    print("What is your name?")
+    print("1. Balaji")
+    print("2. Amruth")
+    print("3. Adil")
+    choice = input("Enter choice: ")
+    
+    if(choice == '1'):
+        os.chdir('balaji')
+    elif(choice == '2'):
+        os.chdir('amruth')
+    elif(choice == '3'):
+        os.chdir('adil')
+    else:
+        print("Wrong choice")
+        return
+    
+    with open('data.json', 'r') as data_file:
+        json_data = data_file.read()
 
-    for offer in arr:
+    arr = json.loads(json_data)
+    
+    e_commerce = json.loads(open('e_commerce-.json').read())
+    fashion = json.loads(open('fashion-.json').read())
+    food_and_beverage = json.loads(open('food_and_beverage-.json').read())
+    travel = json.loads(open('travel-.json').read())
+    entertainment = json.loads(open('entertainment-.json').read())
+    health = json.loads(open('health-.json').read())
+
+    general = json.loads(open('general-.json').read())
+    
+    print("Number of records to be classified: " + str(len(arr)))
+    
+    for ctr in range(len(arr)):
+        offer = arr[ctr]
         print("Make a choice for: ")
         print(offer)
         print("1. e_commerce")
@@ -51,7 +71,19 @@ def label():
             print("UnKnown Option !!")
             general.append(offer)
         print("#################################")
-
+    
+    os.remove('data.json')
+    
+    remaining = []
+    while ctr < len(arr):
+        remaining.append(arr[ctr])
+        ctr += 1
+        
+    print("Remaining SMS to be classified: " + str(len(remaining)))
+        
+    with open('data.json', 'w') as outfile:    
+        json.dump(remaining, outfile)
+        
     with open('e_commerce-' + myName + '.json', 'w') as outfile:
         json.dump(e_commerce, outfile)
 
@@ -73,7 +105,8 @@ def label():
     with open('general-' + myName + '.json', 'w') as outfile:
         json.dump(general, outfile)
 
-
+label()
+        
 def redist():
     m = []
     c = []
